@@ -263,8 +263,8 @@ message LayerParameter {
     SIGMOID = 19;
     SIGMOID_CROSS_ENTROPY_LOSS = 27;
     SILENCE = 36;
-  //  SOFTMAX = 20;
-  //  SOFTMAX_LOSS = 21;
+    SOFTMAX = 20;
+    SOFTMAX_LOSS = 21;
     SPLIT = 22;
     SLICE = 33;
     TANH = 23;
@@ -320,7 +320,7 @@ message LayerParameter {
   optional PowerParameter power_param = 21;
   optional ReLUParameter relu_param = 30;
   optional SigmoidParameter sigmoid_param = 38;
- // optional SoftmaxParameter softmax_param = 39;
+  optional SoftmaxParameter softmax_param = 39;
   optional MultiSoftmaxParameter mult_softmax_param = 41;
   optional MultiSoftmaxLossParameter mult_softmax_loss_param = 42;
   optional SliceParameter slice_param = 31;
@@ -660,14 +660,14 @@ message MultiSoftmaxLossParameter {
 
 
 // Message that stores parameters used by SoftmaxLayer, SoftMaxWithLossLayer
-//message SoftmaxParameter {
-//  enum Engine {
- //   DEFAULT = 0;
-  //  CAFFE = 1;
-  //  CUDNN = 2;
- // }
- // optional Engine engine = 1 [default = DEFAULT];
-//}
+message SoftmaxParameter {
+  enum Engine {
+    DEFAULT = 0;
+    CAFFE = 1;
+    CUDNN = 2;
+  }
+  optional Engine engine = 1 [default = DEFAULT];
+}
 
 // Message that stores parameters used by SigmoidLayer
 message TanHParameter {

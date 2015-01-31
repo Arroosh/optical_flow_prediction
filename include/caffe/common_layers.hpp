@@ -354,7 +354,7 @@ class SilenceLayer : public Layer<Dtype> {
  *
  * TODO(dox): thorough documentation for Forward, Backward, and proto params.
  */
-/*template <typename Dtype>
+template <typename Dtype>
 class SoftmaxLayer : public Layer<Dtype> {
  public:
   explicit SoftmaxLayer(const LayerParameter& param)
@@ -382,14 +382,14 @@ class SoftmaxLayer : public Layer<Dtype> {
   Blob<Dtype> sum_multiplier_;
   /// scale is an intermediate Blob to hold temporary results.
   Blob<Dtype> scale_;
-};*/
+};
 
 #ifdef USE_CUDNN
 /**
  * @brief cuDNN implementation of SoftmaxLayer.
  *        Fallback to SoftmaxLayer for CPU mode.
  */
-/*template <typename Dtype>
+template <typename Dtype>
 class CuDNNSoftmaxLayer : public SoftmaxLayer<Dtype> {
  public:
   explicit CuDNNSoftmaxLayer(const LayerParameter& param)
@@ -409,7 +409,7 @@ class CuDNNSoftmaxLayer : public SoftmaxLayer<Dtype> {
   cudnnHandle_t             handle_;
   cudnnTensor4dDescriptor_t bottom_desc_;
   cudnnTensor4dDescriptor_t top_desc_;
-};*/
+};
 #endif
 
 /**

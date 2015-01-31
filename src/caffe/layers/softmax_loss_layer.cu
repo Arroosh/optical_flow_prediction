@@ -1,4 +1,4 @@
-/*#include <algorithm>
+#include <algorithm>
 #include <cfloat>
 #include <vector>
 
@@ -24,4 +24,4 @@ void SoftmaxWithLossLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
 INSTANTIATE_CLASS(SoftmaxWithLossLayer);
 
 
-}  // namespace caffe*/
+}  // namespace caffe

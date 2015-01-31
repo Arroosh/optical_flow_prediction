@@ -145,7 +145,7 @@ template TanHLayer<double>* GetTanHLayer(const string& name,
     const LayerParameter& param);
 
 // Get softmax layer according to engine.
-/*template <typename Dtype>
+template <typename Dtype>
 SoftmaxLayer<Dtype>* GetSoftmaxLayer(const string& name,
     const LayerParameter& param) {
   SoftmaxParameter_Engine engine = param.softmax_param().engine();
@@ -169,7 +169,7 @@ SoftmaxLayer<Dtype>* GetSoftmaxLayer(const string& name,
 template SoftmaxLayer<float>* GetSoftmaxLayer(const string& name,
     const LayerParameter& param);
 template SoftmaxLayer<double>* GetSoftmaxLayer(const string& name,
-    const LayerParameter& param);*/
+    const LayerParameter& param);
 
 
 // A function to get a specific layer from the specification given in
@@ -242,10 +242,10 @@ Layer<Dtype>* GetLayer(const LayerParameter& param) {
     return new SigmoidCrossEntropyLossLayer<Dtype>(param);
   case LayerParameter_LayerType_SLICE:
     return new SliceLayer<Dtype>(param);
- // case LayerParameter_LayerType_SOFTMAX:
- //   return GetSoftmaxLayer<Dtype>(name, param);
- // case LayerParameter_LayerType_SOFTMAX_LOSS:
- //   return new SoftmaxWithLossLayer<Dtype>(param);
+  case LayerParameter_LayerType_SOFTMAX:
+    return GetSoftmaxLayer<Dtype>(name, param);
+  case LayerParameter_LayerType_SOFTMAX_LOSS:
+    return new SoftmaxWithLossLayer<Dtype>(param);
   case LayerParameter_LayerType_MULTI_SOFTMAX:
     return new MultiSoftmaxLayer<Dtype>(param);
   case LayerParameter_LayerType_MULTI_SOFTMAX_LOSS:

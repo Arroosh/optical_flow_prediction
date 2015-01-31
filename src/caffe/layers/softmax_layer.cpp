@@ -1,4 +1,4 @@
-/*#include <algorithm>
+#include <algorithm>
 #include <vector>
 
 #include "caffe/layer.hpp"
@@ -84,14 +84,14 @@ void SoftmaxLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
   }
   // elementwise multiplication
   caffe_mul(top[0]->count(), bottom_diff, top_data, bottom_diff);
-}*/
+}
 
 
-/*#ifdef CPU_ONLY
+#ifdef CPU_ONLY
 STUB_GPU(SoftmaxLayer);
 #endif
 
-INSTANTIATE_CLASS(SoftmaxLayer);*/
+INSTANTIATE_CLASS(SoftmaxLayer);
 
 
-//}  // namespace caffe
+}  // namespace caffe

@@ -663,7 +663,7 @@ class SigmoidCrossEntropyLossLayer : public LossLayer<Dtype> {
 };
 
 // Forward declare SoftmaxLayer for use in SoftmaxWithLossLayer.
-/*template <typename Dtype> class SoftmaxLayer;*/
+template <typename Dtype> class SoftmaxLayer;
 
 /**
  * @brief Computes the multinomial logistic loss for a one-of-many
@@ -693,7 +693,7 @@ class SigmoidCrossEntropyLossLayer : public LossLayer<Dtype> {
  *        \frac{-1}{N} \sum\limits_{n=1}^N \log(\hat{p}_{n,l_n})
  *      @f$, for softmax output class probabilites @f$ \hat{p} @f$
  */
-/*template <typename Dtype>
+template <typename Dtype>
 class SoftmaxWithLossLayer : public LossLayer<Dtype> {
  public:
   explicit SoftmaxWithLossLayer(const LayerParameter& param)
@@ -721,7 +721,7 @@ class SoftmaxWithLossLayer : public LossLayer<Dtype> {
   virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
       vector<Blob<Dtype>*>* top);
 
-  /**
+  /*
    * @brief Computes the softmax loss error gradient w.r.t. the predictions.
    *
    * Gradients cannot be computed with respect to the label inputs (bottom[1]),
@@ -748,7 +748,7 @@ class SoftmaxWithLossLayer : public LossLayer<Dtype> {
    *   -# @f$ (N \times 1 \times 1 \times 1) @f$
    *      the labels -- ignored as we can't compute their error gradients
    */
-/*  virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
+  virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
       const vector<bool>& propagate_down, vector<Blob<Dtype>*>* bottom);
   virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
       const vector<bool>& propagate_down, vector<Blob<Dtype>*>* bottom);
@@ -761,7 +761,7 @@ class SoftmaxWithLossLayer : public LossLayer<Dtype> {
   vector<Blob<Dtype>*> softmax_bottom_vec_;
   /// top vector holder used in call to the underlying SoftmaxLayer::Forward
   vector<Blob<Dtype>*> softmax_top_vec_;
-};*/
+};
 
 
 // Forward declare SoftmaxLayer for use in SoftmaxWithLossLayer.
