@@ -58,6 +58,8 @@ void BasePrefetchingDataLayer<Dtype>::LayerSetUp(
   // simultaneous cudaMalloc calls when the main thread is running. In some
   // GPUs this seems to cause failures if we do not so.
   this->prefetch_data_.mutable_cpu_data();
+
+
   if (this->output_labels_) {
     this->prefetch_label_.mutable_cpu_data();
   }

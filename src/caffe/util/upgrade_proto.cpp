@@ -490,10 +490,14 @@ LayerParameter_LayerType UpgradeV0LayerType(const string& type) {
     return LayerParameter_LayerType_RELU;
   } else if (type == "sigmoid") {
     return LayerParameter_LayerType_SIGMOID;
-  } else if (type == "softmax") {
-    return LayerParameter_LayerType_SOFTMAX;
-  } else if (type == "softmax_loss") {
-    return LayerParameter_LayerType_SOFTMAX_LOSS;
+  //} else if (type == "softmax") {
+  //  return LayerParameter_LayerType_SOFTMAX;
+  //} else if (type == "softmax_loss") {
+  //  return LayerParameter_LayerType_SOFTMAX_LOSS;
+  } else if (type == "multi_softmax") {
+    return LayerParameter_LayerType_MULTI_SOFTMAX;
+  } else if (type == "multi_softmax_loss") {
+    return LayerParameter_LayerType_MULTI_SOFTMAX_LOSS;
   } else if (type == "split") {
     return LayerParameter_LayerType_SPLIT;
   } else if (type == "tanh") {

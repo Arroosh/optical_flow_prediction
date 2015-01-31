@@ -116,7 +116,8 @@ void convert_dataset(const char* image_filename, const char* label_filename,
     image_file.read(pixels, rows * cols);
     label_file.read(&label, 1);
     datum.set_data(pixels, rows*cols);
-    datum.set_label(label);
+    //Fix Later!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //datum.set_label(label);
     snprintf(key_cstr, kMaxKeyLength, "%08d", item_id);
     datum.SerializeToString(&value);
     string keystr(key_cstr);

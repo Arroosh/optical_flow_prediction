@@ -663,7 +663,7 @@ class SigmoidCrossEntropyLossLayer : public LossLayer<Dtype> {
 };
 
 // Forward declare SoftmaxLayer for use in SoftmaxWithLossLayer.
-template <typename Dtype> class SoftmaxLayer;
+/*template <typename Dtype> class SoftmaxLayer;*/
 
 /**
  * @brief Computes the multinomial logistic loss for a one-of-many
@@ -693,7 +693,7 @@ template <typename Dtype> class SoftmaxLayer;
  *        \frac{-1}{N} \sum\limits_{n=1}^N \log(\hat{p}_{n,l_n})
  *      @f$, for softmax output class probabilites @f$ \hat{p} @f$
  */
-template <typename Dtype>
+/*template <typename Dtype>
 class SoftmaxWithLossLayer : public LossLayer<Dtype> {
  public:
   explicit SoftmaxWithLossLayer(const LayerParameter& param)
@@ -748,7 +748,7 @@ class SoftmaxWithLossLayer : public LossLayer<Dtype> {
    *   -# @f$ (N \times 1 \times 1 \times 1) @f$
    *      the labels -- ignored as we can't compute their error gradients
    */
-  virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
+/*  virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
       const vector<bool>& propagate_down, vector<Blob<Dtype>*>* bottom);
   virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
       const vector<bool>& propagate_down, vector<Blob<Dtype>*>* bottom);
@@ -761,6 +761,54 @@ class SoftmaxWithLossLayer : public LossLayer<Dtype> {
   vector<Blob<Dtype>*> softmax_bottom_vec_;
   /// top vector holder used in call to the underlying SoftmaxLayer::Forward
   vector<Blob<Dtype>*> softmax_top_vec_;
+};*/
+
+
+// Forward declare SoftmaxLayer for use in SoftmaxWithLossLayer.
+template <typename Dtype> class MultiSoftmaxLayer;
+template <typename Dtype>
+class MultiSoftmaxWithLossLayer : public LossLayer<Dtype> {
+ public:
+  explicit MultiSoftmaxWithLossLayer(const LayerParameter& param)
+      : LossLayer<Dtype>(param),
+        softmax_layer_(new MultiSoftmaxLayer<Dtype>(param)) {}
+  virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
+      vector<Blob<Dtype>*>* top);
+  virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
+      vector<Blob<Dtype>*>* top);
+
+  virtual inline LayerParameter_LayerType type() const {
+    return LayerParameter_LayerType_MULTI_SOFTMAX_LOSS;
+  }
+  virtual inline int ExactNumBottomBlobs() const { return -1; }
+  virtual inline int MinBottomBlobs() const { return 2; }
+  virtual inline int MaxBottomBlobs() const { return 3; }
+  virtual inline int ExactNumTopBlobs() const { return -1; }
+  virtual inline int MinTopBlobs() const { return 1; }
+  virtual inline int MaxTopBlobs() const { return 2; }
+  virtual inline void setNumLabels(int num) {numLabels = num;}
+
+ protected:
+  /// @copydoc SoftmaxWithLossLayer
+  virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+      vector<Blob<Dtype>*>* top);
+  virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
+      vector<Blob<Dtype>*>* top);
+  virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
+      const vector<bool>& propagate_down, vector<Blob<Dtype>*>* bottom);
+  virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
+      const vector<bool>& propagate_down, vector<Blob<Dtype>*>* bottom);
+
+  /// The internal SoftmaxLayer used to map predictions to a distribution.
+  shared_ptr<MultiSoftmaxLayer<Dtype> > softmax_layer_;
+  /// prob stores the output probability predictions from the SoftmaxLayer.
+  Blob<Dtype> prob_;
+  /// bottom vector holder used in call to the underlying SoftmaxLayer::Forward
+  vector<Blob<Dtype>*> softmax_bottom_vec_;
+  /// top vector holder used in call to the underlying SoftmaxLayer::Forward
+  vector<Blob<Dtype>*> softmax_top_vec_;
+
+  int numLabels;
 };
 
 }  // namespace caffe

@@ -48,6 +48,7 @@ void ConvolutionLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
     stride_w_ = conv_param.stride_w();
   }
   // Configure output channels and groups.
+
   channels_ = bottom[0]->channels();
   num_output_ = this->layer_param_.convolution_param().num_output();
   CHECK_GT(num_output_, 0);
@@ -59,6 +60,7 @@ void ConvolutionLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   // - blobs_[0] holds the filter weights
   // - blobs_[1] holds the biases (optional)
   bias_term_ = this->layer_param_.convolution_param().bias_term();
+
   if (this->blobs_.size() > 0) {
     LOG(INFO) << "Skipping parameter initialization";
   } else {

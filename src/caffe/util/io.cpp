@@ -87,7 +87,7 @@ bool ReadImageToDatum(const string& filename, const int label,
   datum->set_channels(num_channels);
   datum->set_height(cv_img.rows);
   datum->set_width(cv_img.cols);
-  datum->set_label(label);
+  //datum->set_label(label);
   datum->clear_data();
   datum->clear_float_data();
   string* datum_string = datum->mutable_data();

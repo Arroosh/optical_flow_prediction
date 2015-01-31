@@ -354,7 +354,7 @@ class SilenceLayer : public Layer<Dtype> {
  *
  * TODO(dox): thorough documentation for Forward, Backward, and proto params.
  */
-template <typename Dtype>
+/*template <typename Dtype>
 class SoftmaxLayer : public Layer<Dtype> {
  public:
   explicit SoftmaxLayer(const LayerParameter& param)
@@ -382,14 +382,14 @@ class SoftmaxLayer : public Layer<Dtype> {
   Blob<Dtype> sum_multiplier_;
   /// scale is an intermediate Blob to hold temporary results.
   Blob<Dtype> scale_;
-};
+};*/
 
 #ifdef USE_CUDNN
 /**
  * @brief cuDNN implementation of SoftmaxLayer.
  *        Fallback to SoftmaxLayer for CPU mode.
  */
-template <typename Dtype>
+/*template <typename Dtype>
 class CuDNNSoftmaxLayer : public SoftmaxLayer<Dtype> {
  public:
   explicit CuDNNSoftmaxLayer(const LayerParameter& param)
@@ -409,8 +409,47 @@ class CuDNNSoftmaxLayer : public SoftmaxLayer<Dtype> {
   cudnnHandle_t             handle_;
   cudnnTensor4dDescriptor_t bottom_desc_;
   cudnnTensor4dDescriptor_t top_desc_;
-};
+};*/
 #endif
+
+/**
+ * @brief Computes the softmax function.
+ *
+ * TODO(dox): thorough documentation for Forward, Backward, and proto params.
+ */
+template <typename Dtype>
+class MultiSoftmaxLayer : public Layer<Dtype> {
+ public:
+  explicit MultiSoftmaxLayer(const LayerParameter& param)
+      : Layer<Dtype>(param) {}
+  virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
+      vector<Blob<Dtype>*>* top);
+
+  virtual inline LayerParameter_LayerType type() const {
+    return LayerParameter_LayerType_MULTI_SOFTMAX;
+  }
+  virtual inline int ExactNumBottomBlobs() const { return 1; }
+  virtual inline int ExactNumTopBlobs() const { return 1; }
+
+  virtual inline void setNumLabels(int num) {numLabels = num;}
+
+ protected:
+  virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+      vector<Blob<Dtype>*>* top);
+  virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
+      vector<Blob<Dtype>*>* top);
+  virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
+      const vector<bool>& propagate_down, vector<Blob<Dtype>*>* bottom);
+  virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
+     const vector<bool>& propagate_down, vector<Blob<Dtype>*>* bottom);
+
+  /// sum_multiplier is used to carry out sum using BLAS
+  Blob<Dtype> sum_multiplier_;
+  /// scale is an intermediate Blob to hold temporary results.
+  Blob<Dtype> scale_;
+
+  int numLabels;
+};
 
 /**
  * @brief Creates a "split" path in the network by copying the bottom Blob

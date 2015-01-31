@@ -130,15 +130,16 @@ void DataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
       << (*top)[0]->width();
   // label
   if (this->output_labels_) {
-    (*top)[1]->Reshape(this->layer_param_.data_param().batch_size(), 1, 1, 1);
+    (*top)[1]->Reshape(this->layer_param_.data_param().batch_size(), datum.label_size(), 1, 1);
     this->prefetch_label_.Reshape(this->layer_param_.data_param().batch_size(),
-        1, 1, 1);
+        datum.label_size(), 1, 1);
   }
   // datum size
   this->datum_channels_ = datum.channels();
   this->datum_height_ = datum.height();
   this->datum_width_ = datum.width();
   this->datum_size_ = datum.channels() * datum.height() * datum.width();
+
 }
 
 // This function is used to create a thread that prefetches the data.
@@ -171,11 +172,12 @@ void DataLayer<Dtype>::InternalThreadEntry() {
       LOG(FATAL) << "Unknown database backend";
     }
 
-    // Apply data transformations (mirror, scale, crop...)
-    this->data_transformer_.Transform(item_id, datum, this->mean_, top_data);
+    // Apply data transformations (mirror, scale, crop...) Fix!!!!!!!!!!!!!!
+    //this->data_transformer_.Transform(item_id, datum, this->mean_, top_data);
 
     if (this->output_labels_) {
-      top_label[item_id] = datum.label();
+	for (int label_i = 0; label_i < datum.label_size(); label_i++)
+		top_label[item_id * datum.label_size() + label_i] = datum.label(label_i);
     }
 
     // go to the next iter

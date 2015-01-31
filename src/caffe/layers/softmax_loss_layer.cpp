@@ -1,4 +1,4 @@
-#include <algorithm>
+/*#include <algorithm>
 #include <cfloat>
 #include <vector>
 
@@ -90,4 +90,4 @@ STUB_GPU(SoftmaxWithLossLayer);
 INSTANTIATE_CLASS(SoftmaxWithLossLayer);
 
 
-}  // namespace caffe
+}  // namespace caffe*/
