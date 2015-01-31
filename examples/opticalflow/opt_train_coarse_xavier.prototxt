@@ -3,7 +3,7 @@ layers {
   name: "data"
   type: DATA
   data_param {
-    source: "/scratch/jcwalker/OpFlowCaffeMid/opt_train_db"
+    source: "/scratch/jcwalker/OpFlowCaffeMid/opt_test_db"
     backend: LEVELDB
     batch_size: 100
   }
@@ -13,7 +13,7 @@ transform_param {
     mean_file: "/scratch/jcwalker/OpFlowCaffeMid/opt_train_db.binaryproto"
 }
   top: "data"
-  top: "label"
+  top: "multilabel"
 }
 layers {
   name: "conv1"
@@ -312,5 +312,5 @@ layers {
 	num_label: 40
 }
   bottom: "fc8"
-  bottom: "label"
+  bottom: "multilabel"
 }

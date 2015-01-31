@@ -48,13 +48,7 @@ for (int batch_item_id = 0; batch_item_id < num; ++batch_item_id) {
     this->data_transformer_.Transform(
         batch_item_id, datum_vector[batch_item_id], this->mean_, top_data);
 
-		for (int label_i = 0; label_i < datum_vector[batch_item_id].label_size(); label_i++)
-		{
-			top_label[batch_item_id * datum_vector[batch_item_id].label_size() + label_i] = datum_vector[batch_item_id].label(label_i);
-		}
-
-
-    //top_label[batch_item_id] = datum_vector[batch_item_id].label();
+       top_label[batch_item_id] = datum_vector[batch_item_id].label();
   }
   // num_images == batch_size_
   Reset(top_data, top_label, batch_size_);
