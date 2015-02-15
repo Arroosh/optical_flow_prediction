@@ -131,11 +131,13 @@ void DataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
   // label
   if (this->output_labels_) {
     
-    if(datum.multilabel_size() > 1){
+    if(this->layer_param_.transform_param().multilabelscale() > 0){
+    int numLabels = this->layer_param_.transform_param().multilabelscale()*
+		this->layer_param_.transform_param().multilabelscale();
     (*top)[1]->Reshape(this->layer_param_.data_param().batch_size(), 
-		datum.multilabel_size(), 1, 1);
+		numLabels, 1, 1);
     		this->prefetch_label_.Reshape(this->layer_param_.data_param().batch_size(),
-        	datum.multilabel_size(), 1, 1);
+        	numLabels, 1, 1);
     }
 
     else {
@@ -185,11 +187,10 @@ void DataLayer<Dtype>::InternalThreadEntry() {
     // Apply data transformations (mirror, scale, crop...) 
 
 
-    if (this->output_labels_ && datum.multilabel_size() > 1) {
-	for (int label_i = 0; label_i < datum.multilabel_size(); label_i++)
-	{
-		top_label[item_id * datum.multilabel_size() + label_i] = datum.multilabel(label_i);
-	}
+    if (this->output_labels_ && this->layer_param_.transform_param().multilabelscale() > 1) 
+    {
+	this->data_transformer_.TransformDataAndLabel
+		(item_id, datum, this->mean_, top_data, top_label);
     }
     else if (this->output_labels_) {
     this->data_transformer_.Transform(item_id, datum, this->mean_, top_data);

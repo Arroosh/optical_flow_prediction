@@ -38,12 +38,32 @@ class DataTransformer {
   void Transform(const int batch_item_id, const Datum& datum,
                  const Dtype* mean, Dtype* transformed_data);
 
+  void TransformDataAndLabel(const int batch_item_id, const Datum& datum,
+                 const Dtype* mean, Dtype* transformed_data, Dtype* transformed_labels);
+
  protected:
   virtual unsigned int Rand();
 
   // Tranformation parameters
   TransformationParameter param_;
 
+  inline Dtype DoPixelAverage(const int& height, const int& channel, const int& width,
+int& h, int& c, int& w, double& heightRatio, double& widthRatio, const string& data) 
+{
+
+   if((w*widthRatio) > 0 && w*widthRatio < (width - 1))
+   {
+   	return static_cast<Dtype>(static_cast<uint8_t>(data[(c * height + h*heightRatio) * width + w*widthRatio]))/3.0 +
+   	static_cast<Dtype>(static_cast<uint8_t>(data[(c * height + h*heightRatio) * width + w*widthRatio - 1]))/3.0 +
+   	static_cast<Dtype>(static_cast<uint8_t>(data[(c * height + h*heightRatio) * width + w*widthRatio + 1]))/3.0;
+   }
+   
+   else
+   {
+        return static_cast<Dtype>(static_cast<uint8_t>(data[(c * height + h*heightRatio) * width + w*widthRatio]));
+   } 
+
+}
 
   shared_ptr<Caffe::RNG> rng_;
   Caffe::Phase phase_;

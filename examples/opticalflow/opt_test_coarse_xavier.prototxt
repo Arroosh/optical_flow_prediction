@@ -3,15 +3,15 @@ layers {
   name: "data"
   type: DATA
   data_param {
-    source: "/scratch/jcwalker/OptFlowOrig/opt_train_db"
+    source: "/scratch/jcwalker/OptFlowOrig/opt_test_db"
     backend: LEVELDB
     batch_size: 100
   }
 transform_param {
     crop_size: 200
-    mirror: true
-    mean_file: "/scratch/jcwalker/OptFlowOrig/opt_train_db.binaryproto"
-    isrand: true
+    mirror: false
+    mean_file: "/scratch/jcwalker/OptFlowBigDataCaffe/opt_train_db.binaryproto"
+    isrand: false
     multilabelscale: 20
     downsample: true
 }
@@ -306,6 +306,17 @@ layers {
   }
   bottom: "fc7"
   top: "fc8"
+}
+
+layers{
+  name: "softmax_3dnormal"
+  type: MULTI_SOFTMAX
+  mult_softmax_param {
+	num_label: 40
+}
+  bottom: "fc8"
+  top: "fc8"
+  include: { phase: TEST }
 }
 
 layers {

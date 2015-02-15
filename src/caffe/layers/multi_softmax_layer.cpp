@@ -34,9 +34,13 @@ void MultiSoftmaxLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
 	int dimClass;
 
 	if(this->layer_param_.mult_softmax_param().num_label())
+	{
 		dimClass = this->layer_param_.mult_softmax_param().num_label();
-	else
+		numLabels = dimClass;	
+	}	
+	else{
 		dimClass = numLabels;
+	}
 
 	int imgSize = dim / dimClass;
 	scale_.Reshape(bottom[0]->num() * imgSize, 1, 1, 1);
@@ -52,10 +56,21 @@ void MultiSoftmaxLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
 	int num = bottom[0]->num();
 	int dim = bottom[0]->count() / bottom[0]->num();
 	int dimClass = numLabels;
+
+	if(this->layer_param_.mult_softmax_param().num_label())
+	{
+		dimClass = this->layer_param_.mult_softmax_param().num_label();
+		numLabels = dimClass;	
+	}	
+	else{
+		dimClass = numLabels;
+	}
+
 	int imgSize = dim / dimClass;
 	memcpy(top_data, bottom_data, sizeof(Dtype) * bottom[0]->count());
 	// we need to subtract the max to avoid numerical issues, compute the exp,
 	// and then normalize.
+
 	for (int i = 0; i < num; ++i)
 	{
 		for (int j = 0; j < imgSize; ++j)
@@ -65,6 +80,7 @@ void MultiSoftmaxLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
 				scale_data[i * imgSize + j] = max(scale_data[i * imgSize + j], bottom_data[i * dim + j * dimClass + k]);
 		}
 	}
+
 	// subtraction
 	for (int i = 0; i < num; ++i)
 	{
@@ -88,6 +104,7 @@ void MultiSoftmaxLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
 		}
 	}
 	// Do division
+
 	for(int i = 0; i < num; ++i)
 	{
 		for (int j = 0; j < imgSize; ++j)
