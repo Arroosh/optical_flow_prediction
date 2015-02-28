@@ -2,7 +2,7 @@ paramBall = [];
 
 global paramBall
 
-paramBall.vidDir = '/home/jcwalker/OptFlowBigData/'
+paramBall.vidDir = '/home/jcwalker/OptFlowReallyBig/'
 paramBall.testVidDir = '/home/jcwalker/OptFlowBigData/'
 paramBall.progDir = '/nfs/hn48/jcwalker/caffe/ImprovedOpticalFlow/improved_trajectory_release/release/'
 paramBall.framesToSample = 25
@@ -34,3 +34,5 @@ paramBall.filter_size = 11
 paramBall.secLength = 5
 paramBall.getSingleFlow = true
 paramBall.canonicalSize = [240 320]
+paramBall.minProb = .000000000000000000001
+paramBall.theZeroCluster = 27

@@ -73,7 +73,12 @@ class BasePrefetchingDataLayer :
  public:
   explicit BasePrefetchingDataLayer(const LayerParameter& param)
       : BaseDataLayer<Dtype>(param) {}
-  virtual ~BasePrefetchingDataLayer() {}
+  virtual ~BasePrefetchingDataLayer() {
+	for(int i = 0; i<prefetch_label_.size();i++)
+	{
+		delete prefetch_label_[i];
+	}
+  }
   // LayerSetUp: implements common data layer setup functionality, and calls
   // DataLayerSetUp to do special data layer setup for individual layer types.
   // This method may not be overridden.
@@ -92,7 +97,7 @@ class BasePrefetchingDataLayer :
 
  protected:
   Blob<Dtype> prefetch_data_;
-  Blob<Dtype> prefetch_label_;
+  std::vector< Blob<Dtype>* > prefetch_label_;
 };
 
 template <typename Dtype>
@@ -109,7 +114,7 @@ class DataLayer : public BasePrefetchingDataLayer<Dtype> {
   }
   virtual inline int ExactNumBottomBlobs() const { return 0; }
   virtual inline int MinTopBlobs() const { return 1; }
-  virtual inline int MaxTopBlobs() const { return 2; }
+  virtual inline int MaxTopBlobs() const { return 4; }
 
  protected:
   virtual void InternalThreadEntry();

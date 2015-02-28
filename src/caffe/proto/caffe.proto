@@ -271,6 +271,9 @@ message LayerParameter {
     TANH = 23;
     WINDOW_DATA = 24;
     THRESHOLD = 31;
+    RESHAPE = 40;
+    RESIZE = 41;
+
   }
   optional LayerType type = 5; // the layer type from the enum above
 
@@ -331,6 +334,10 @@ message LayerParameter {
 
   // Parameters for data pre-processing.
   optional TransformationParameter transform_param = 36;
+  
+    optional ReshapeParameter reshape_param = 43;
+  optional ResizeParameter resize_param = 44;
+
 
   // Note: certain layers may have more than one computational engine
   // for their implementation. These layers include an Engine type and
@@ -341,6 +348,24 @@ message LayerParameter {
   // This should never be used by any code except to upgrade to the new
   // LayerParameter specification.
   optional V0LayerParameter layer = 1;
+}
+
+message ReshapeParameter {
+  // for reshape layer
+  optional uint32 new_channel = 1 [default = 0];
+  optional uint32 new_height = 2 [default = 0];
+  optional uint32 new_width = 3 [default = 0];
+  optional uint32 new_patch_width = 4 [default = 0];
+  optional uint32 new_patch_height = 5 [default = 0];
+  
+}
+
+message ResizeParameter{
+	optional uint32 height = 1;
+	optional uint32 width = 2;
+	optional bool  is_pyramid_test = 3 [default = false];
+	optional float out_height_scale = 4;
+	optional float out_width_scale = 5;
 }
 
 // Message that stores parameters used to apply transformation
@@ -355,7 +380,7 @@ message TransformationParameter {
   // Specify if we would like to randomly crop an image.
   optional uint32 crop_size = 3 [default = 0];
   optional string mean_file = 4;
-  optional uint32 multilabelscale = 5 [default = 0];
+  repeated uint32 multilabelscale = 5;
   optional bool isrand = 6 [default = false];
   optional bool downsample = 7 [default = false];
 }
@@ -654,12 +679,11 @@ message SliceParameter {
 
 // Message that stores parameters used by SoftmaxLayer, SoftMaxWithLossLayer
 message MultiSoftmaxParameter {
-  optional uint32 num_label = 1;
 }
 
 // Message that stores parameters used by SoftmaxLayer, SoftMaxWithLossLayer
 message MultiSoftmaxLossParameter {
-  optional uint32 num_label = 1;
+  optional uint32 learning_multiple = 1 [default = 1];
 }
 
 

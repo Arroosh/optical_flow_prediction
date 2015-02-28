@@ -3,9 +3,9 @@ layers {
   name: "data"
   type: DATA
   data_param {
-    source: "/scratch/jcwalker/OptFlowBigDataCaffe/opt_train_db"
+    source: "/scratch/jcwalker/OptFlowBigDataCaffe/opt_test_db"
     backend: LEVELDB
-    batch_size: 100
+    batch_size: 20
   }
 transform_param {
     crop_size: 200
@@ -13,10 +13,12 @@ transform_param {
     mean_file: "/scratch/jcwalker/OptFlowBigDataCaffe/opt_train_db.binaryproto"
     isrand: true
     multilabelscale: 20
+    multilabelscale: 100
     downsample: true
 }
   top: "data"
   top: "thelabelscoarse"
+  top: "thelabelsfine"
 }
 layers {
   name: "conv1"
@@ -308,6 +310,7 @@ layers {
   top: "fc8"
 }
 
+
 layers {
   name: "reshape_coarse_global"
   type: RESHAPE
@@ -322,6 +325,7 @@ layers {
   }
 }
 
+
 layers {
   name: "loss_flow_coarse"
   type: MULTI_SOFTMAX_LOSS
@@ -331,3 +335,219 @@ layers {
   bottom: "reshapefc8"
   bottom: "thelabelscoarse"
 }
+
+layers {
+  name: "resize_coarse_global"
+  type: RESIZE
+  bottom: "reshapefc8"
+  top: "resize_coarse_global"
+  resize_param {
+    height: 200
+    width: 200
+  }
+}
+
+layers {
+  name: "concat_fine_data"
+  type: CONCAT
+  bottom: "resize_coarse_global"
+  bottom: "data"
+  top: "concat_fine_data"
+}
+
+layers {
+  name: "conv7"
+  type: CONVOLUTION
+  blobs_lr: 1
+  blobs_lr: 2
+  weight_decay: 1
+  weight_decay: 0
+  convolution_param {
+    num_output: 40
+    kernel_size: 5
+    stride: 2
+    pad:2
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+  bottom: "concat_fine_data"
+  top: "conv7"
+}
+layers {
+  name: "relu7"
+  type: RELU
+  bottom: "conv7"
+  top: "conv7"
+}
+layers {
+  name: "norm7"
+  type: LRN
+  lrn_param {
+    local_size: 5
+    alpha: 0.0001
+    beta: 0.75
+  }
+  bottom: "conv7"
+  top: "norm7"
+}
+layers {
+  name: "conv8"
+  type: CONVOLUTION
+  blobs_lr: 1
+  blobs_lr: 2
+  weight_decay: 1
+  weight_decay: 0
+  convolution_param {
+    num_output: 40
+    kernel_size: 5
+    stride: 1
+    pad:2
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.1
+    }
+  }
+  bottom: "norm7"
+  top: "conv8"
+}
+layers {
+  name: "relu8"
+  type: RELU
+  bottom: "conv8"
+  top: "conv8"
+}
+layers {
+  name: "norm8"
+  type: LRN
+  lrn_param {
+    local_size: 5
+    alpha: 0.0001
+    beta: 0.75
+  }
+  bottom: "conv8"
+  top: "norm8"
+}
+layers {
+  name: "conv9"
+  type: CONVOLUTION
+  blobs_lr: 1
+  blobs_lr: 2
+  weight_decay: 1
+  weight_decay: 0
+  convolution_param {
+    num_output: 40
+    kernel_size: 5
+    stride: 1
+    pad:2
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+  bottom: "norm8"
+  top: "conv9"
+}
+layers {
+  name: "relu9"
+  type: RELU
+  bottom: "conv9"
+  top: "conv9"
+}
+layers {
+  name: "conv10"
+  type: CONVOLUTION
+  blobs_lr: 1
+  blobs_lr: 2
+  weight_decay: 1
+  weight_decay: 0
+  convolution_param {
+    num_output: 40
+    kernel_size: 5
+    stride: 1
+    pad:2
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.1
+    }
+  }
+  bottom: "conv9"
+  top: "conv10"
+}
+layers {
+  name: "relu10"
+  type: RELU
+  bottom: "conv10"
+  top: "conv10"
+}
+layers {
+  name: "conv11"
+  type: CONVOLUTION
+  blobs_lr: 1
+  blobs_lr: 2
+  weight_decay: 1
+  weight_decay: 0
+  convolution_param {
+    num_output: 40
+    kernel_size: 5
+    stride: 1 
+    pad:2
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.1
+    }
+  }
+  bottom: "conv10"
+  top: "conv11"
+}
+layers {
+  name: "relu11"
+  type: RELU
+  bottom: "conv11"
+  top: "conv11"
+}
+
+layers {
+  name: "loss_flow_fine"
+  type: MULTI_SOFTMAX_LOSS
+  mult_softmax_loss_param {
+	learning_multiple: 100
+}
+  bottom: "conv11"
+  bottom: "thelabelsfine"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

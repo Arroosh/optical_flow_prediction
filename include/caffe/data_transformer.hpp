@@ -3,6 +3,7 @@
 
 #include "caffe/common.hpp"
 #include "caffe/proto/caffe.pb.h"
+#include "caffe/blob.hpp"
 
 namespace caffe {
 
@@ -39,7 +40,7 @@ class DataTransformer {
                  const Dtype* mean, Dtype* transformed_data);
 
   void TransformDataAndLabel(const int batch_item_id, const Datum& datum,
-                 const Dtype* mean, Dtype* transformed_data, Dtype* transformed_labels);
+                 const Dtype* mean, Dtype* transformed_data, std::vector< Blob<Dtype>* >& label_list);
 
  protected:
   virtual unsigned int Rand();

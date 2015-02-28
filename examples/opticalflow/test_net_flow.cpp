@@ -117,22 +117,27 @@ int main(int argc, char** argv)
 		Blob<float>* bboxs = (*(caffe_test_net.bottom_vecs().rbegin()))[0];
 		int bsize = bboxs->num();
 
+		int channel = bboxs->channels();
+		int height  = bboxs->height();
+		int width   = bboxs->width();
+		printf("channel:%d, height:%d, width:%d\n", channel, height, width);
+
 		const Blob<float>* labels = (*(caffe_test_net.bottom_vecs().rbegin()))[1];
+
 		for (int i = 0; i < bsize && counts < data_counts; i++, counts++)
 		{
 			char fname[1010];
 			fscanf(file, "%s", fname);
-			for(int w = 0; w < outputDim; w ++)
-				for(int h = 0; h < outputDim; h ++)
-				{
-					int lbl;
-					fscanf(file,"%d",&lbl);
-				}
+
 			fprintf(resultfile, "%s ", fname);
-			int len = outputDim * outputDim * numLabels;
-			for(int j = 0; j < len; j ++)
-			{
-				fprintf(resultfile, "%f ", (float)(bboxs->data_at(i, j, 0, 0)) );
+			//int len = LABEL_SIZE * LABEL_LEN;
+			for(int h = 0; h < height; h ++) {
+			    for(int w = 0; w < width; w ++) {
+			        for(int c = 0; c < channel; c ++)
+				{
+				    fprintf(resultfile, "%f ", (float)(bboxs->data_at(i, c, h, w)) ); 
+				}
+			    }
 			}
 			fprintf(resultfile, "\n");
 		}

@@ -32,6 +32,66 @@ namespace caffe {
  *   be filtered. col2im restores the output spatial structure by rolling up
  *   the output channel N' columns of the output matrix.
  */
+/*reshape layer
+ */
+template <typename Dtype>
+class ReshapeLayer : public Layer<Dtype> {
+ public:
+  explicit ReshapeLayer(const LayerParameter& param)
+      : Layer<Dtype>(param) {}
+  virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
+      vector<Blob<Dtype>*>* top);
+  
+ virtual inline LayerParameter_LayerType type() const {
+    return LayerParameter_LayerType_RESHAPE;
+  }
+
+
+
+ protected:
+  virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+      vector<Blob<Dtype>*>* top);
+  virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
+      vector<Blob<Dtype>*>* top);
+  virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
+      const vector<bool>&  propagate_down, vector<Blob<Dtype>*>* bottom);
+  virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
+      const vector<bool>&  propagate_down, vector<Blob<Dtype>*>* bottom);
+};
+
+/*resize layer
+ */
+template <typename Dtype>
+class ResizeLayer : public Layer<Dtype> {
+ public:
+  explicit ResizeLayer(const LayerParameter& param)
+      : Layer<Dtype>(param) {}
+  virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
+      vector<Blob<Dtype>*>* top);
+  
+ virtual inline LayerParameter_LayerType type() const {
+    return LayerParameter_LayerType_RESIZE;
+  }
+
+ protected:
+  virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+      vector<Blob<Dtype>*>* top);
+  virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
+      vector<Blob<Dtype>*>* top);
+  virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
+      const vector<bool>&  propagate_down, vector<Blob<Dtype>*>* bottom);
+  virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
+      const vector<bool>&  propagate_down, vector<Blob<Dtype>*>* bottom);
+
+  vector<Blob<Dtype>*> locs_;
+  int out_height_;
+  int out_width_;
+  int out_channels_;
+  int out_num_;
+
+};
+
+
 template <typename Dtype>
 class ConvolutionLayer : public Layer<Dtype> {
  public:

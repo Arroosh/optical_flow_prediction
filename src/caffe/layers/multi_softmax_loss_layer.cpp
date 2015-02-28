@@ -18,13 +18,12 @@ void MultiSoftmaxWithLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bo
 		vector<Blob<Dtype>*>* top)
 {
         LossLayer<Dtype>::LayerSetUp(bottom, top);
+	CHECK_EQ(bottom.size(), 2) << "Multi SoftmaxLoss Layer takes two blobs as input.";
+	//CHECK_EQ(top->size(), 0) << "Multi SoftmaxLoss Layer takes no blob as output.";
 	softmax_bottom_vec_.clear();
 	softmax_bottom_vec_.push_back(bottom[0]);
 	softmax_top_vec_.push_back(&prob_);
-        softmax_layer_->setNumLabels(this->layer_param_.mult_softmax_loss_param().num_label());
-        numLabels = this->layer_param_.mult_softmax_loss_param().num_label();
 	softmax_layer_->SetUp(softmax_bottom_vec_, &softmax_top_vec_);
-
 }
 
 template <typename Dtype>
@@ -48,23 +47,24 @@ void MultiSoftmaxWithLossLayer<Dtype>::Forward_cpu(
 	const Dtype* prob_data = prob_.cpu_data();
 	const Dtype* label = bottom[1]->cpu_data();
 	int num = prob_.num();
-
 	int dim = prob_.count() / num;
-	int dimClass = this->layer_param_.mult_softmax_loss_param().num_label();
-	int imgSize = dim / dimClass;
-
+	int dimClass = bottom[0]->channels();
+	int height = bottom[0]->height();
+	int width  = bottom[0]->width();
+	int imgSize = height * width;
 	Dtype loss = 0;
 	for (int i = 0; i < num; ++i)
 	{
 		for(int j = 0; j < imgSize; j ++)
 		{
-			loss += -log(max(
-					prob_data[i * dim + j * dimClass + static_cast<int>(label[i * imgSize + j]) - 1 ], Dtype(FLT_MIN)));
+			int nowlabel = static_cast<int>(label[i * imgSize + j]) - 1;
+			loss += -log(max( prob_data[i * dim + nowlabel * imgSize + j], Dtype(FLT_MIN)));
 		}
 
 	}
 
   (*top)[0]->mutable_cpu_data()[0] = loss / num ;
+  
   if (top->size() == 2) {
     (*top)[1]->ShareData(prob_);
   }
@@ -77,23 +77,31 @@ void MultiSoftmaxWithLossLayer<Dtype>::Backward_cpu(
 		vector<Blob<Dtype>*>* bottom)
 {
 	// Compute the diff
+
+	// Compute the diff
 	Dtype* bottom_diff = (*bottom)[0]->mutable_cpu_diff();
 	const Dtype* prob_data = prob_.cpu_data();
 	memcpy(bottom_diff, prob_data, sizeof(Dtype) * prob_.count());
 	const Dtype* label = (*bottom)[1]->cpu_data();
 	int num = prob_.num();
 	int dim = prob_.count() / num;
-	int dimClass = this->layer_param_.mult_softmax_loss_param().num_label();
-	int imgSize = dim / dimClass;
+	int dimClass = (*bottom)[0]->channels();
+	int height = (*bottom)[0]->height();
+	int width  = (*bottom)[0]->width();
+	int imgSize = height * width;
+
 	for (int i = 0; i < num; ++i)
 	{
 		for(int j = 0; j < imgSize; j ++)
 		{
-			bottom_diff[i * dim + j * dimClass + static_cast<int>(label[i * imgSize + j]) - 1 ] -= 1;
+			int nowlabel = static_cast<int>(label[i * imgSize + j]) - 1;
+			bottom_diff[ i * dim + nowlabel * imgSize + j  ] -= 1;
 		}
 	}
 	// Scale down gradient
-	caffe_scal(prob_.count(), Dtype(1) / num, bottom_diff);
+	Dtype multiple = this->layer_param_.mult_softmax_loss_param().learning_multiple();
+
+	caffe_scal(prob_.count(), Dtype(1)*multiple / num, bottom_diff);
 }
 
 INSTANTIATE_CLASS(MultiSoftmaxWithLossLayer);

@@ -3,7 +3,7 @@ layers {
   name: "data"
   type: DATA
   data_param {
-    source: "/scratch/jcwalker/OptFlowOrig/opt_test_db"
+    source: "/scratch/jcwalker/OptFlowBigDataCaffe/opt_test_db"
     backend: LEVELDB
     batch_size: 100
   }
@@ -16,7 +16,7 @@ transform_param {
     downsample: true
 }
   top: "data"
-  top: "thelabels"
+  top: "thelabelscoarse"
 }
 layers {
   name: "conv1"
@@ -308,23 +308,33 @@ layers {
   top: "fc8"
 }
 
-layers{
-  name: "softmax_3dnormal"
-  type: MULTI_SOFTMAX
-  mult_softmax_param {
-	num_label: 40
-}
+layers {
+  name: "reshape_coarse_global"
+  type: RESHAPE
   bottom: "fc8"
-  top: "fc8"
-  include: { phase: TEST }
+  top: "reshapefc8"
+  reshape_param {
+    new_channel: 40 
+    new_height: 20
+    new_width: 20
+    new_patch_width: 20
+    new_patch_height: 20
+  }
+}
+
+layers{
+  name: "softmax_flow"
+  type: MULTI_SOFTMAX
+  bottom: "reshapefc8"
+  top: "reshapefc8"
 }
 
 layers {
-  name: "loss_flow"
+  name: "loss_flow_coarse"
   type: MULTI_SOFTMAX_LOSS
   mult_softmax_loss_param {
-	num_label: 40
+	learning_multiple: 1
 }
-  bottom: "fc8"
-  bottom: "thelabels"
+  bottom: "reshapefc8"
+  bottom: "thelabelscoarse"
 }

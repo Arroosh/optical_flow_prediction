@@ -129,20 +129,43 @@ void DataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
       << (*top)[0]->channels() << "," << (*top)[0]->height() << ","
       << (*top)[0]->width();
   // label
+
+
   if (this->output_labels_) {
-    
-    if(this->layer_param_.transform_param().multilabelscale() > 0){
-    int numLabels = this->layer_param_.transform_param().multilabelscale()*
-		this->layer_param_.transform_param().multilabelscale();
-    (*top)[1]->Reshape(this->layer_param_.data_param().batch_size(), 
-		numLabels, 1, 1);
-    		this->prefetch_label_.Reshape(this->layer_param_.data_param().batch_size(),
-        	numLabels, 1, 1);
+
+
+    if(this->layer_param_.transform_param().multilabelscale_size() > 0){
+
+	    if(top->size() != (this->layer_param_.transform_param().multilabelscale_size()+1))
+	    {
+	    	LOG(FATAL) << "Data top size is " << top->size() << " but multilable size is " <<
+			this->layer_param_.transform_param().multilabelscale_size() << std::endl;
+	    }
+
+	    for(int theLabels = 0; theLabels < this->layer_param_.transform_param().multilabelscale_size(); theLabels++)
+	    {
+		if(this->layer_param_.transform_param().multilabelscale(theLabels) == 0)
+		{
+			break;
+		}
+
+	    	int numLabels = this->layer_param_.transform_param().multilabelscale(theLabels)*
+				this->layer_param_.transform_param().multilabelscale(theLabels);
+	    	(*top)[1+theLabels]->Reshape(this->layer_param_.data_param().batch_size(), 
+				numLabels, 1, 1);
+		Blob<Dtype>* u = new Blob<Dtype>;
+		this->prefetch_label_.push_back(u);
+
+	    	this->prefetch_label_[theLabels]->Reshape(this->layer_param_.data_param().batch_size(),
+				numLabels, 1, 1);
+	    }
     }
 
     else {
+    Blob<Dtype>* u = new Blob<Dtype>;
+    this->prefetch_label_.push_back(u);
     (*top)[1]->Reshape(this->layer_param_.data_param().batch_size(), 1, 1, 1);
-    this->prefetch_label_.Reshape(this->layer_param_.data_param().batch_size(),
+    this->prefetch_label_[0]->Reshape(this->layer_param_.data_param().batch_size(),
         1, 1, 1);
     }
   }
@@ -162,7 +185,7 @@ void DataLayer<Dtype>::InternalThreadEntry() {
   Dtype* top_data = this->prefetch_data_.mutable_cpu_data();
   Dtype* top_label = NULL;  // suppress warnings about uninitialized variables
   if (this->output_labels_) {
-    top_label = this->prefetch_label_.mutable_cpu_data();
+    top_label = this->prefetch_label_[0]->mutable_cpu_data();
   }
   const int batch_size = this->layer_param_.data_param().batch_size();
 
@@ -186,11 +209,10 @@ void DataLayer<Dtype>::InternalThreadEntry() {
 
     // Apply data transformations (mirror, scale, crop...) 
 
-
-    if (this->output_labels_ && this->layer_param_.transform_param().multilabelscale() > 1) 
+    if (this->output_labels_ && this->layer_param_.transform_param().multilabelscale(0) > 1) 
     {
 	this->data_transformer_.TransformDataAndLabel
-		(item_id, datum, this->mean_, top_data, top_label);
+		(item_id, datum, this->mean_, top_data, this->prefetch_label_);
     }
     else if (this->output_labels_) {
     this->data_transformer_.Transform(item_id, datum, this->mean_, top_data);

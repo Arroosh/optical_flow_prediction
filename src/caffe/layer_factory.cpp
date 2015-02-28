@@ -246,6 +246,10 @@ Layer<Dtype>* GetLayer(const LayerParameter& param) {
     return GetSoftmaxLayer<Dtype>(name, param);
   case LayerParameter_LayerType_SOFTMAX_LOSS:
     return new SoftmaxWithLossLayer<Dtype>(param);
+  case LayerParameter_LayerType_RESHAPE:
+    return new ReshapeLayer<Dtype>(param);
+   case LayerParameter_LayerType_RESIZE:
+    return new ResizeLayer<Dtype>(param);
   case LayerParameter_LayerType_MULTI_SOFTMAX:
     return new MultiSoftmaxLayer<Dtype>(param);
   case LayerParameter_LayerType_MULTI_SOFTMAX_LOSS:

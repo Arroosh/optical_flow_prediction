@@ -9,6 +9,7 @@ theAvis = dir([paramBall.vidDir '*.avi']);
 load([paramBall.caffeDataDir '/clusters.mat'], 'C');
 
 for i = 1:length(theAvis)
+    i
     if(~isLocked([paramBall.vidDir 'Lock/' theAvis(i).name '_flow_lock']))
         [~, AviName, ~] = fileparts(theAvis(i).name);
         homeFolder = [paramBall.vidDir '/' AviName '/images/'];

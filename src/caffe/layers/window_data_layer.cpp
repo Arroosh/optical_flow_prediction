@@ -166,7 +166,9 @@ void WindowDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
       (*top)[0]->channels() * (*top)[0]->height() * (*top)[0]->width();
   // label
   (*top)[1]->Reshape(batch_size, 1, 1, 1);
-  this->prefetch_label_.Reshape(batch_size, 1, 1, 1);
+  Blob<Dtype>* u = new Blob<Dtype>;
+  this->prefetch_label_.push_back(u);
+  this->prefetch_label_[0]->Reshape(batch_size, 1, 1, 1);
 }
 
 template <typename Dtype>
@@ -184,7 +186,7 @@ void WindowDataLayer<Dtype>::InternalThreadEntry() {
   // windows and N*(1-p) are background (non-object) windows
 
   Dtype* top_data = this->prefetch_data_.mutable_cpu_data();
-  Dtype* top_label = this->prefetch_label_.mutable_cpu_data();
+  Dtype* top_label = this->prefetch_label_[0]->mutable_cpu_data();
   const Dtype scale = this->layer_param_.window_data_param().scale();
   const int batch_size = this->layer_param_.window_data_param().batch_size();
   const int context_pad = this->layer_param_.window_data_param().context_pad();
