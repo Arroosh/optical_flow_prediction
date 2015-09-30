@@ -1,16 +1,17 @@
 name: "FlowNet"
 layers {
   name: "data"
-  type: DATA
-  data_param {
-    source: "/scratch/jcwalker/OptFlowBigDataCaffe/opt_test_db"
-    backend: LEVELDB
+  type: IMAGE_MULTILABEL_DATA
+  image_multilabel_data_param {
+    source: "./test.txt"
     batch_size: 100
+    new_height: 200
+    new_width: 200
   }
 transform_param {
     crop_size: 200
     mirror: false
-    mean_file: "/scratch/jcwalker/OptFlowBigDataCaffe/opt_train_db.binaryproto"
+    mean_file: "./opt_train_db.binaryproto"
     isrand: false
     multilabelscale: 20
     downsample: true
@@ -18,6 +19,7 @@ transform_param {
   top: "data"
   top: "thelabelscoarse"
 }
+
 layers {
   name: "conv1"
   type: CONVOLUTION
@@ -330,7 +332,7 @@ layers{
 }
 
 layers {
-  name: "loss_flow_coarse"
+  name: "silence"
   type: MULTI_SOFTMAX_LOSS
   mult_softmax_loss_param {
 	learning_multiple: 1

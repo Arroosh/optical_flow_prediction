@@ -1,0 +1,6 @@
+These images are not part of the UCF101 dataset, even though
+the model was trained on the UCF101.
+
+image20.jpg: https://www.youtube.com/watch?v=Y34iaTtnelc
+image30.jpg: https://en.wikipedia.org/wiki/Punching_bag#/media/File:Punching_bag.jpg
+image40.jpg: https://en.wikipedia.org/wiki/Hairstyle#/media/File:One-year-old_gets_first_haircut_IMG_5764.JPG

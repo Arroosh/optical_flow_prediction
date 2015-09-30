@@ -102,6 +102,20 @@ inline bool ReadImageToDatum(const string& filename, const int label,
   return ReadImageToDatum(filename, label, 0, 0, datum);
 }
 
+bool ReadImageToMultiLabelDatum(const string& filename, const string& label,
+    const int height, const int width, const bool is_color, Datum* datum);
+
+inline bool ReadImageToMultiLabelDatum(const string& filename, const string& label,
+    const int height, const int width, Datum* datum) {
+  return ReadImageToMultiLabelDatum(filename, label, height, width, true, datum);
+}
+
+inline bool ReadImageToMultiLabelDatum(const string& filename, const string& label,
+    Datum* datum) {
+  return ReadImageToMultiLabelDatum(filename, label, 0, 0, datum);
+}
+
+
 leveldb::Options GetLevelDBOptions();
 
 template <typename Dtype>

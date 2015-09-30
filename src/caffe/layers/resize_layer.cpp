@@ -57,6 +57,10 @@ void ResizeLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     vector<Blob<Dtype>*>* top) {
 
 	ResizeBlob_cpu(bottom[0], (*top)[0] ,this->locs_[0],this->locs_[1],this->locs_[2],this->locs_[3]);
+
+        ResizeParameter resize_param = this->layer_param_.resize_param();
+        Dtype theMultiple = resize_param.multiple_scale();
+        caffe_scal((*top)[0]->count(), theMultiple, (*top)[0]->mutable_cpu_data());
   return;
 }
 

@@ -40,7 +40,7 @@ class Classifier(caffe.Net):
         if channel_swap is not None:
             self.set_channel_swap(self.inputs[0], channel_swap)
 
-        self.crop_dims = np.array(self.blobs[self.inputs[0]].data.shape[2:])
+        #self.crop_dims = np.array(self.blobs[self.inputs[0]].data.shape[2:])
         if not image_dims:
             image_dims = self.crop_dims
         self.image_dims = image_dims

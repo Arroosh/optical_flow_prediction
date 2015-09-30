@@ -219,6 +219,10 @@ void DataLayer<Dtype>::InternalThreadEntry() {
 	top_label[item_id] = datum.label();
     }
 
+  datum.clear_data();
+  datum.clear_float_data();
+  datum.clear_multilabel();
+
     // go to the next iter
     switch (this->layer_param_.data_param().backend()) {
     case DataParameter_DB_LEVELDB:

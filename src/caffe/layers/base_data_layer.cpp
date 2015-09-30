@@ -35,7 +35,9 @@ void BaseDataLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
     const string& mean_file = transform_param_.mean_file();
     LOG(INFO) << "Loading mean file from" << mean_file;
     BlobProto blob_proto;
+
     ReadProtoFromBinaryFileOrDie(mean_file.c_str(), &blob_proto);
+
     data_mean_.FromProto(blob_proto);
     CHECK_GE(data_mean_.num(), 1);
     CHECK_GE(data_mean_.channels(), datum_channels_);
@@ -45,8 +47,10 @@ void BaseDataLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
     // Simply initialize an all-empty mean.
     data_mean_.Reshape(1, datum_channels_, datum_height_, datum_width_);
   }
+
   mean_ = data_mean_.cpu_data();
   data_transformer_.InitRand();
+
 }
 
 template <typename Dtype>
@@ -60,13 +64,13 @@ void BasePrefetchingDataLayer<Dtype>::LayerSetUp(
   this->prefetch_data_.mutable_cpu_data();
 
 
-  if (this->output_labels_) {
 
-   for (int i = 0; i < this->prefetch_label_.size(); i++)
-    {
+
+  for (int i = 0; i < this->prefetch_label_.size(); i++)
+  {
     	this->prefetch_label_[i]->mutable_cpu_data();
-    }
   }
+
   DLOG(INFO) << "Initializing prefetch";
   this->CreatePrefetchThread();
   DLOG(INFO) << "Prefetch initialized.";

@@ -55,7 +55,7 @@ int CreateDir(const char *sPathName, int beg) {
 char buf[101000];
 int main(int argc, char** argv)
 {
-	cudaSetDevice(0);
+	cudaSetDevice(atoi(argv[7]));
 	Caffe::set_phase(Caffe::TEST);
 
 	if (argc == 8 && strcmp(argv[7], "CPU") == 0) {
@@ -74,8 +74,8 @@ int main(int argc, char** argv)
 	caffe_test_net.CopyTrainedLayersFrom(trained_net_param);
 
 	vector<shared_ptr<Layer<float> > > layers = caffe_test_net.layers();
-	const DataLayer<float> *datalayer = dynamic_cast<const DataLayer<float>* >(layers[0].get());
-	CHECK(datalayer);
+	//const DataLayer<float> *datalayer = dynamic_cast<const DataLayer<float>* >(layers[0].get());
+	//CHECK(datalayer);
 
 	string labelFile(argv[3]);
 	int data_counts = 0;
@@ -107,7 +107,6 @@ int main(int argc, char** argv)
 	int batchCount = std::ceil(data_counts / (floor)(c2));
 
 	string resulttxt = rootfolder + "FlowResult.txt";
-	FILE * resultfile = fopen(resulttxt.c_str(), "w");
 
 	for (int batch_id = 0; batch_id < batchCount; ++batch_id)
 	{
@@ -123,27 +122,38 @@ int main(int argc, char** argv)
 		printf("channel:%d, height:%d, width:%d\n", channel, height, width);
 
 		const Blob<float>* labels = (*(caffe_test_net.bottom_vecs().rbegin()))[1];
+		Blob<float> aBlob;
+		aBlob.Reshape(1,channel, height, width);
+		float* aBlobData = aBlob.mutable_cpu_data();
+		float* bBData = bboxs->mutable_cpu_data();
 
 		for (int i = 0; i < bsize && counts < data_counts; i++, counts++)
 		{
 			char fname[1010];
-			fscanf(file, "%s", fname);
 
+			std::stringstream theNum;
+
+			theNum << counts;
+			fscanf(file, "%s", fname);
+			std::string resulttxt = rootfolder + theNum.str() + std::string(".txt");
+			FILE * resultfile = fopen(resulttxt.c_str(), "w");
 			fprintf(resultfile, "%s ", fname);
-			//int len = LABEL_SIZE * LABEL_LEN;
-			for(int h = 0; h < height; h ++) {
-			    for(int w = 0; w < width; w ++) {
-			        for(int c = 0; c < channel; c ++)
-				{
-				    fprintf(resultfile, "%f ", (float)(bboxs->data_at(i, c, h, w)) ); 
-				}
-			    }
-			}
-			fprintf(resultfile, "\n");
+			std::string thename(theNum.str());
+			thename = rootfolder + thename + std::string(".h5");
+
+ 			hid_t file_id_ = H5Fcreate(thename.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT,
+                        H5P_DEFAULT);
+
+			caffe_copy(channel*height*width,bBData + bboxs->offset(i,0,0,0),aBlobData);
+
+			hdf5_save_nd_dataset(file_id_, "Outputs", aBlob);					
+			fclose(resultfile);
+			H5Fclose(file_id_);
+			fscanf(file, "%s", fname);
 		}
 	}
 
-	fclose(resultfile);
+
 	fclose(file);
 
 

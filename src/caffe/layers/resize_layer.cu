@@ -18,6 +18,11 @@ template <typename Dtype>
 void ResizeLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     vector<Blob<Dtype>*>* top) {
   ResizeBlob_gpu(bottom[0], (*top)[0], this->locs_[0],this->locs_[1],this->locs_[2],this->locs_[3]);
+
+  ResizeParameter resize_param = this->layer_param_.resize_param();
+  Dtype theMultiple = resize_param.multiple_scale();
+  caffe_gpu_scal((*top)[0]->count(), theMultiple, (*top)[0]->mutable_gpu_data());
+
 }
 
 

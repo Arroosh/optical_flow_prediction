@@ -250,6 +250,7 @@ message LayerParameter {
     HINGE_LOSS = 28;
     IM2COL = 11;
     IMAGE_DATA = 12;
+    IMAGE_MULTILABEL_DATA = 42;
     INFOGAIN_LOSS = 13;
     INNER_PRODUCT = 14;
     LRN = 15;
@@ -315,6 +316,7 @@ message LayerParameter {
   optional HDF5OutputParameter hdf5_output_param = 14;
   optional HingeLossParameter hinge_loss_param = 29;
   optional ImageDataParameter image_data_param = 15;
+  optional ImageMultiLabelDataParameter image_multilabel_data_param = 45;
   optional InfogainLossParameter infogain_loss_param = 16;
   optional InnerProductParameter inner_product_param = 17;
   optional LRNParameter lrn_param = 18;
@@ -366,6 +368,7 @@ message ResizeParameter{
 	optional bool  is_pyramid_test = 3 [default = false];
 	optional float out_height_scale = 4;
 	optional float out_width_scale = 5;
+	optional float multiple_scale = 6 [default = 1.0];
 }
 
 // Message that stores parameters used to apply transformation
@@ -563,6 +566,37 @@ message ImageDataParameter {
   optional bool mirror = 6 [default = false];
 }
 
+// Message that stores parameters used by ImageDataLayer
+message ImageMultiLabelDataParameter {
+  // Specify the data source.
+  optional string source = 1;
+  // Specify the batch size.
+  optional uint32 batch_size = 4;
+  // The rand_skip variable is for the data layer to skip a few data points
+  // to avoid all asynchronous sgd clients to start at the same point. The skip
+  // point would be set as rand_skip * rand(0,1). Note that rand_skip should not
+  // be larger than the number of keys in the leveldb.
+  optional uint32 rand_skip = 7 [default = 0];
+  // Whether or not ImageLayer should shuffle the list of files at every epoch.
+  optional bool shuffle = 8 [default = false];
+  // It will also resize images if new_height or new_width are not zero.
+  optional uint32 new_height = 9 [default = 0];
+  optional uint32 new_width = 10 [default = 0];
+  // DEPRECATED. See TransformationParameter. For data pre-processing, we can do
+  // simple scaling and subtracting the data mean, if provided. Note that the
+  // mean subtraction is always carried out before scaling.
+  optional float scale = 2 [default = 1];
+  optional string mean_file = 3;
+  // DEPRECATED. See TransformationParameter. Specify if we would like to randomly
+  // crop an image.
+  optional uint32 crop_size = 5 [default = 0];
+  // DEPRECATED. See TransformationParameter. Specify if we want to randomly mirror
+  // data.
+  optional bool mirror = 6 [default = false];
+}
+
+
+
 // Message that stores parameters InfogainLossLayer
 message InfogainLossParameter {
   // Specify the infogain matrix source.
@@ -679,6 +713,7 @@ message SliceParameter {
 
 // Message that stores parameters used by SoftmaxLayer, SoftMaxWithLossLayer
 message MultiSoftmaxParameter {
+  optional uint32 max_multiple = 1 [default = 1];
 }
 
 // Message that stores parameters used by SoftmaxLayer, SoftMaxWithLossLayer

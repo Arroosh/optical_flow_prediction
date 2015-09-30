@@ -254,6 +254,37 @@ class HDF5OutputLayer : public Layer<Dtype> {
  * TODO(dox): thorough documentation for Forward and proto params.
  */
 template <typename Dtype>
+class ImageMultiLabelDataLayer : public BasePrefetchingDataLayer<Dtype> {
+ public:
+  explicit ImageMultiLabelDataLayer(const LayerParameter& param)
+      : BasePrefetchingDataLayer<Dtype>(param) {}
+  virtual ~ImageMultiLabelDataLayer();
+  virtual void DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
+      vector<Blob<Dtype>*>* top);
+
+  virtual inline LayerParameter_LayerType type() const {
+    return LayerParameter_LayerType_IMAGE_MULTILABEL_DATA;
+  }
+  virtual inline int ExactNumBottomBlobs() const { return 0; }
+  virtual inline int MaxTopBlobs() const { return 4; }
+
+ protected:
+  shared_ptr<Caffe::RNG> prefetch_rng_;
+  virtual void ShuffleImages();
+  virtual void InternalThreadEntry();
+
+  vector<std::pair<std::string, std::string> > lines_;
+  int lines_id_;
+};
+
+
+
+/**
+ * @brief Provides data to the Net from image files.
+ *
+ * TODO(dox): thorough documentation for Forward and proto params.
+ */
+template <typename Dtype>
 class ImageDataLayer : public BasePrefetchingDataLayer<Dtype> {
  public:
   explicit ImageDataLayer(const LayerParameter& param)

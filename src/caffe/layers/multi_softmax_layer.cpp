@@ -92,6 +92,9 @@ void MultiSoftmaxLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
 		}
 	}
 	// Do division
+
+	Dtype multiple = this->layer_param_.mult_softmax_param().max_multiple();
+
 	for(int i = 0; i < num; ++i)
 	{
 		for (int j = 0; j < imgSize; ++j)
@@ -99,6 +102,7 @@ void MultiSoftmaxLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
 			for(int k = 0; k < dimClass; ++k)
 			{
 				top_data[i * dim + k * imgSize + j] /= Dtype(1.) * scale_data[i * imgSize + j];
+				top_data[i * dim + k * imgSize + j] *= multiple;
 			}
 		}
 	}
