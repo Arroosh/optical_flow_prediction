@@ -8,6 +8,8 @@ Jacob Walker, Abhinav Gupta, and Martial Hebert
 
 Please look under examples/opticalflow for a demonstration.
 Download the trained model on UCF101 from ladoga.graphics.cs.cmu.edu/jcwalker/final.caffemodel to examples/opticalflow
+In most of our experiments we used the standard splits for evaluation. However, this model utilizes as much training data as possible. All groups except for group 5 are used for training this particular model. 
+
 
 Compile Caffe, and run ./test.sh under examples/opticalflow to generate features for predicted optical flow.
 
